@@ -33,6 +33,7 @@ contract('TokenFarm', ([owner, investor]) => {
 	// 	"investor: ": investor // Accounts[1] @ Ganache
 	// });
     // Load Contracts
+    // Loading the contract in bare_JS and with Chai_Test are not the same
     daiToken = await DaiToken.new()
     dappToken = await DappToken.new()
     tokenFarm = await TokenFarm.new(dappToken.address, daiToken.address)
@@ -42,7 +43,7 @@ contract('TokenFarm', ([owner, investor]) => {
     // - So that TokenFarm_contract has to have DappToken
     // - Investor has to have DaiToken
 
-    // Transfer all Dapp tokensToWei to farm (1 million)
+    // Transfer all Dapptokens to farm (1 million)
     // TokenFarm has to have DappToken
     await dappToken.transfer(
       tokenFarm.address
@@ -109,21 +110,25 @@ contract('TokenFarm', ([owner, investor]) => {
       let result
 
       // Check investor balance before staking
-      result = await daiToken.balanceOf(investor)
+      var investor_balance = await daiToken.balanceOf(investor)
       // in the before(async), we decided that investor001 has 100DAI
-      assert.equal(result.toString(), tokensToWei('100'), 'investor Mock DAI wallet balance correct before staking')
+      assert.equal(investor_balance.toString(), tokensToWei('100'), 'investor Mock DAI wallet balance correct before staking')
 
       // Stake Mock DAI Tokens
       // Before transfer token, an approval is mandatory
-      // allowance = array(uint, array(address, uint))
-      // mapping(address => mapping(address => uint256)) public allowance
-	  //
-	  // TokenFarm_ContractAddress is allowed/approved to spend 100tokens from investor001
+      // TokenFarm_ContractAddress is allowed/approved to spend 100tokens from investor001
+      // - Investor001 has 100DaiToken
+      // We approve TokenFarm_address to spend 100DaiTokens from @investor
       await daiToken.approve(
-		tokenFarm.address
-		, tokensToWei('100')
-		, { from: investor }
-	  )
+        tokenFarm.address // This is the _spender
+        , tokensToWei('100')
+        , { 
+          from: investor // this is the allower
+        }
+      )
+
+      // Once again, before something like transfer(..), transferFrom(..), stakeTokens(..)
+      // - then it is better to approve the transaction first... this event happen above
       await tokenFarm.stakeTokens(tokensToWei('100'), { from: investor })
 
       // Check staking result

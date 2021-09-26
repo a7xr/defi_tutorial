@@ -8,6 +8,8 @@ Token_sale
 
 
 Defi_tutorial
+    You have to read about the ERC20, 
+        what are needed in the Contract
     The goal of this project is:
         When investor001 invest/stake into TokenFarm, then investor001 is going to earn DappToken001
     27.18
@@ -64,11 +66,20 @@ My own
 
 
 
-web3.eth.sendTransaction({
-    from: '0x801Eff044d1F06F98219E111ceF184A81E4c5c27',
-    to: '0xc46e0aaa248B4427A122E8F79c671697e0d0329f',
-    value: '10000000000000000000'
-})
-.then(function(receipt){
-   console.log ("OK")
-});
+The mandatory field at ERC20
+    contract ERC20 {
+        function totalSupply() constant returns (uint theTotalSupply);
+        function balanceOf(address _owner) constant returns (uint balance);
+        function transfer(address _to, uint _value) returns (bool success);
+        function transferFrom(address _from, address _to, uint _value) returns
+        (bool success);
+        function approve(address _spender, uint _value) returns (bool success);
+        function allowance(address _owner, address _spender) constant returns
+        (uint remaining);
+        event Transfer(address indexed _from, address indexed _to, uint _value);
+        event Approval(address indexed _owner, address indexed _spender, uint _value);
+        }
+    Useful but not mandatory
+        name
+        symbol
+        decimals

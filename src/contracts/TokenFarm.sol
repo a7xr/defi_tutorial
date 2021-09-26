@@ -4,6 +4,20 @@ import "./DappToken.sol";
 import "./DaiToken.sol";
 
 contract TokenFarm {
+    // TokenFarm Map
+        // name,
+        // owner
+        // dappToken
+        // daiToken
+        // 
+        // address[] stakers
+        // array(address => uint) stakingBalance
+        // array(address => bool) hasStaked
+        // array(address => bool) isStaking
+        //
+        // stakeTokens(uint _amount)
+        // unstakeTokens()
+        // issueTokens()
     string public name = "Dapp Token Farm";
     address public owner;
     DappToken public dappToken;
@@ -20,12 +34,19 @@ contract TokenFarm {
         owner = msg.sender;
     }
 
+    // StakeTokens means DepositTokens
+        // investor001 is going to transfer daiTokens to this tokenFarm_contract
+    // UnstakeTokens means WithdrawTokens
     function stakeTokens(uint _amount) public {
         // Require amount greater than 0
         require(_amount > 0, "amount cannot be 0");
 
-        // Trasnfer Mock Dai tokens to this contract for staking
-        daiToken.transferFrom(msg.sender, address(this), _amount);
+        // Transfer Mock Dai tokens to this contract for staking
+        daiToken.transferFrom( // Once again, this function is mandatory in ERC20
+            msg.sender
+            , address(this)
+            , _amount
+        );
 
         // Update staking balance
         stakingBalance[msg.sender] = stakingBalance[msg.sender] + _amount;

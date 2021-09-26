@@ -30,9 +30,12 @@ contract DaiToken {
     }
 
     function transfer(address _to, uint256 _value) public returns (bool success) {
-        require(balanceOf[msg.sender] >= _value);
+        require(balanceOf[
+            msg.sender // This is going to have value when calling this function with param ({from:XXX})
+            ] >= _value);
         balanceOf[msg.sender] -= _value;
         balanceOf[_to] += _value;
+        // it is the code below that is going to do the transfer
         emit Transfer(msg.sender, _to, _value);
         return true;
     }
