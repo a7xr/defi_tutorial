@@ -1,0 +1,74 @@
+
+Token_sale
+    truffle console
+    truffle test
+    web3.eth.accounts
+
+
+
+
+Defi_tutorial
+    The goal of this project is:
+        When investor001 invest/stake into TokenFarm, then investor001 is going to earn DappToken001
+    27.18
+    truffle compile
+    truffle migrate //23:19
+        // To put your contract into the blockchain
+        // The first account is the default for truffle
+    truffle console
+        > tokenFarm = await TokenFarm.deployed()
+            await: promises in javascript
+                Not going to run the code immediately, may be the code is long
+            AFAIK; we are going to deploy the contract
+        > tokenFarm.address
+        [output] Address
+            Default 
+        > name = await tokenFarm.name()
+            There is a field "name" in the TokenFarm.sol
+        > name
+        [output] Address
+
+
+
+    29:14
+        Mock Dai Token is going to be placed in TokenFarm
+        So you are going to have DappToken for that action
+
+        First, we need TokenFarm_Contract to be aware of Dai_Token
+
+        Depl DAI
+        Depl DappToken
+        Depl TokenFarm
+
+        You create a new contract, you have to declare it in the migration_files
+
+        We need to insert DappTkn into the TokenFarm
+            Bcz, when DaiTkn is inserted into TokenFarm, then the investor should receive DappTkn
+        
+        Truffle Console
+            > mDai = await DaiToken.deployed()
+                // Do not forget the "await"
+            > accounts = await web3.eth.getAccounts()
+            > accounts[1]
+            > balance = await mDai.balanceOf(accounts[1])
+            > balance.toString()
+                >>> balance.toString()
+            > formattedBalance = web3.utils.fromWei(balance)
+                >>> 100
+            > web3.utils.toWei('1.5', 'Ether')
+                >>> 1500000000000000000
+
+My own
+    web3.eth.getBalance("0x407d73d8a49eeb85d32cf465507dd71d507100c1").then(console.log);
+    https://web3js.readthedocs.io/en/v1.2.11
+
+
+
+web3.eth.sendTransaction({
+    from: '0x801Eff044d1F06F98219E111ceF184A81E4c5c27',
+    to: '0xc46e0aaa248B4427A122E8F79c671697e0d0329f',
+    value: '10000000000000000000'
+})
+.then(function(receipt){
+   console.log ("OK")
+});
