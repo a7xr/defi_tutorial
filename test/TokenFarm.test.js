@@ -24,7 +24,12 @@ function tokensToWei(n) {
   return web3.utils.toWei(n, 'ether');
 }
 
-contract('TokenFarm', ([owner, investor]) => {
+contract('TokenFarm', (
+  [
+    owner         // accounts[0] ... do not know why that
+    , investor    // accounts[1] ... do not know why that
+  ]
+) => {
   let daiToken, dappToken, tokenFarm
 
   before(async () => {
@@ -106,7 +111,7 @@ contract('TokenFarm', ([owner, investor]) => {
 
   describe('Farming tokens', async () => {
 
-    it('rewards investors for staking mDai tokensToWei', async () => {
+    it('rewards investors for staking mDai tokens', async () => {
       let result
 
       // Check investor balance before staking
@@ -128,25 +133,37 @@ contract('TokenFarm', ([owner, investor]) => {
       )
 
       // Once again, before something like transfer(..), transferFrom(..), stakeTokens(..)
-      // - then it is better to approve the transaction first... this event happen above
+      // - then it is better to approve the transaction first... that event happen above
       await tokenFarm.stakeTokens(tokensToWei('100'), { from: investor })
 
       // Check staking result
-      result = await daiToken.balanceOf(investor)
-      assert.equal(result.toString(), tokensToWei('0'), 'investor Mock DAI wallet balance correct after staking')
+      investor_balance = await daiToken.balanceOf(investor)
+      // investor has 100DaiTokens and he staked 100DaiTokens
+      // - so that investor_balance = 0
+      assert.equal(investor_balance.toString(), tokensToWei('0'), 'investor Mock DAI wallet balance correct after staking')
 
       // Checking the DaiToken in TokenFarm is 100tokens
-      result = await daiToken.balanceOf(tokenFarm.address)
-      assert.equal(result.toString(), tokensToWei('100'), 'Token Farm Mock DAI balance correct after staking')
+      var daiTokenBalance_at_tokenFarmContract = await daiToken.balanceOf(tokenFarm.address)
+      assert.equal(
+        daiTokenBalance_at_tokenFarmContract.toString()
+        , tokensToWei('100')
+        , 'Token Farm Mock DAI balance correct after staking'
+      )
 
-      result = await tokenFarm.stakingBalance(investor)
-      assert.equal(result.toString(), tokensToWei('100'), 'investor staking balance correct after staking')
+      var stakingBalance_ofInvestor = await tokenFarm.stakingBalance(investor) // array(address => uint) : stakingBalance
+      assert.equal( 
+        stakingBalance_ofInvestor.toString()
+        , tokensToWei('100')
+        , 'investor staking balance correct after staking'
+      )
 
-      result = await tokenFarm.isStaking(investor)
-      assert.equal(result.toString(), 'true', 'investor staking status correct after staking')
+      var isInvestorStaking = await tokenFarm.isStaking(investor)
+      assert.equal(isInvestorStaking.toString(), 'true', 'investor staking status correct after staking')
 
       // Issue Tokens
       await tokenFarm.issueTokens({ from: owner })
+      // console.log("Owner: ", owner) // accounts[0] @Ganache
+      // console.log("Investor: ", investor) // accounts[1] @Ganache
 
       // Check balances after issuance
       result = await dappToken.balanceOf(investor)
@@ -156,11 +173,12 @@ contract('TokenFarm', ([owner, investor]) => {
       await tokenFarm.issueTokens({ from: investor }).should.be.rejected;
 
       // Unstake tokensToWei
+      // - Do not understand why there is NO approval before unstakeTokens(..)
       await tokenFarm.unstakeTokens({ from: investor })
 
       // Check results after unstaking
-      result = await daiToken.balanceOf(investor)
-      assert.equal(result.toString(), tokensToWei('100'), 'investor Mock DAI wallet balance correct after staking')
+      investor_balance = await daiToken.balanceOf(investor)
+      assert.equal(investor_balance.toString(), tokensToWei('100'), 'investor Mock DAI wallet balance correct after staking')
 
       result = await daiToken.balanceOf(tokenFarm.address)
       assert.equal(result.toString(), tokensToWei('0'), 'Token Farm Mock DAI balance correct after staking')
